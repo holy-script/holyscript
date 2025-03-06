@@ -24,10 +24,22 @@ const FluidFlow = () => {
     // Handle resizing
     const handleResize = () => {
       if (!canvasRef.current || !glRef.current) return;
-      canvasRef.current.width = window.innerWidth;
-      canvasRef.current.height = window.innerHeight;
-      glRef.current.viewport(0, 0, window.innerWidth, window.innerHeight);
+
+      // Get new dimensions
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+
+      // Prevent unnecessary resize due to address bar appearing/disappearing
+      const heightDiff = Math.abs(newHeight - canvasRef.current.height);
+      if (heightDiff < 80) return;  // Ignore small changes from mobile address bar
+
+      canvasRef.current.width = newWidth;
+      canvasRef.current.height = newHeight;
+
+      const gl = glRef.current;
+      gl.viewport(0, 0, newWidth, newHeight);
     };
+
     window.addEventListener("resize", handleResize);
 
     // Vertex Shader
@@ -42,7 +54,7 @@ const FluidFlow = () => {
 
     // Fragment Shader (Realistic Evolving Water)
     const fragmentShaderSource = `
-      precision mediump float;
+      precision highp float;
       varying vec2 vUv;
       uniform float uTime;
       uniform vec2 uResolution;
@@ -52,15 +64,21 @@ const FluidFlow = () => {
           return -1.0 + 2.0 * fract(sin(p) * 43758.5453);
       }
 
+      // Perlin Noise with Smoother Sampling
       float perlinNoise(vec2 p) {
           vec2 i = floor(p);
           vec2 f = fract(p);
-          vec2 u = f * f * (3.0 - 2.0 * f);
-          return mix(mix(dot(hash(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)), 
-                         dot(hash(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),
-                     mix(dot(hash(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)), 
-                         dot(hash(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
+          f = f * f * (3.0 - 2.0 * f);  // Smoother interpolation
+
+          return mix(
+              mix(dot(hash(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),
+                  dot(hash(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), f.x),
+              mix(dot(hash(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),
+                  dot(hash(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), f.x),
+              f.y
+          );
       }
+
 
       float fbm(vec2 p) {
           float value = 0.0;
