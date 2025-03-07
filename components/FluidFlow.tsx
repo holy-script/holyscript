@@ -1,4 +1,5 @@
 "use client";
+import { useTheme } from "@/providers/ThemeContext";
 import { useEffect, useRef } from "react";
 
 const FluidFlow = () => {
@@ -6,6 +7,11 @@ const FluidFlow = () => {
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const programRef = useRef<WebGLProgram | null>(null);
   const animationFrameIdRef = useRef<number | null>(null);
+  const darkColor = "vec3(0.02, 0.05, 0.3)";
+  const lightColor = "vec3(0.1, 0.3, 0.7)";
+  const elapsedTimeRef = useRef(0);
+
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,21 +30,11 @@ const FluidFlow = () => {
     // Handle resizing
     const handleResize = () => {
       if (!canvasRef.current || !glRef.current) return;
-
-      // Get new dimensions
-      const newWidth = window.innerWidth;
-      const newHeight = window.innerHeight;
-
-      // Prevent unnecessary resize due to address bar appearing/disappearing
-      const heightDiff = Math.abs(newHeight - canvasRef.current.height);
-      if (heightDiff < 80) return;  // Ignore small changes from mobile address bar
-
-      canvasRef.current.width = newWidth;
-      canvasRef.current.height = newHeight;
-
-      const gl = glRef.current;
-      gl.viewport(0, 0, newWidth, newHeight);
+      canvasRef.current.width = window.innerWidth;
+      canvasRef.current.height = window.innerHeight;
+      glRef.current.viewport(0, 0, window.innerWidth, window.innerHeight);
     };
+    window.addEventListener("resize", handleResize);
 
     window.addEventListener("resize", handleResize);
 
@@ -103,7 +99,8 @@ const FluidFlow = () => {
           float evolvingNoise = fbm(uv * 3.0 + uTime * 0.1);
           float ripple = rippleEffect(uv * 2.0, uTime * 0.5);
 
-          vec3 color = vec3(0.1, 0.3, 0.7) + evolvingNoise * 0.3 + ripple * 0.2;
+          vec3 color = ${isDarkMode ? darkColor : lightColor
+      } + evolvingNoise * 0.3 + ripple * 0.2;
           gl_FragColor = vec4(color, 0.3);
       }
     `;
@@ -153,7 +150,7 @@ const FluidFlow = () => {
     const uTime = glRef.current.getUniformLocation(program, "uTime");
     const uResolution = glRef.current.getUniformLocation(program, "uResolution");
 
-    let time = 0;
+    let time = elapsedTimeRef.current;
 
     const render = () => {
       if (!glRef.current) return;
@@ -172,15 +169,14 @@ const FluidFlow = () => {
     render();
 
     return () => {
-      if (glRef.current && programRef.current) {
-        glRef.current.deleteProgram(programRef.current);
-      }
       if (animationFrameIdRef.current) {
         cancelAnimationFrame(animationFrameIdRef.current);
       }
+      elapsedTimeRef.current = time;
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+
+  }, [isDarkMode]);
 
   return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full pointer-events-none"></canvas>;
 };
