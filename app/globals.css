@@ -1,51 +1,11 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer components {
+  .card {
+    @apply flex flex-col justify-between w-3/4 h-80 p-9 border-[1px] border-[rgba(255,255,255,0.25)] rounded-[20px] bg-[rgba(255,255,255,0.1)] shadow-[0_0_10px_1px_rgba(0,0,0,0.25)] backdrop-blur-[15px] text-white;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.card {
-  max-width: 300px;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  max-width: 500px;
-  width: 100%;
-  height: 300px;
-  padding: 35px;
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
-
-  backdrop-filter: blur(15px);
-}
-
-.card-footer {
-  font-size: 1.2em;
-  color: #446;
+  .card-footer {
+    @apply text-[1.2em] text-white;
+  }
 }

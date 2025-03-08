@@ -13,13 +13,21 @@ export const ThemeProvider = ({ children }: { children: ReactNode; }) => {
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setIsDarkMode(prefersDark);
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDarkMode(mediaQuery.matches);
+    const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
-  if (isDarkMode === null) return null; // Prevent hydration mismatch
+  if (isDarkMode === null) return (
+    <div className="flex items-center justify-center h-screen">
+      <p className="text-2xl font-bold">Loading...</p>
+    </div>
+  );
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>

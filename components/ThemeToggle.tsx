@@ -5,8 +5,6 @@ import { useTheme } from "@/providers/ThemeContext";
 const ThemeToggle = () => {
   const { isDarkMode, toggleTheme } = useTheme();
 
-  if (isDarkMode === null) return null; // Prevent hydration mismatch
-
   return (
     <button
       onClick={toggleTheme}

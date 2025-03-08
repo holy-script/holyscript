@@ -101,7 +101,7 @@ const FluidFlow = () => {
 
           vec3 color = ${isDarkMode ? darkColor : lightColor
       } + evolvingNoise * 0.3 + ripple * 0.2;
-          gl_FragColor = vec4(color, 0.3);
+          gl_FragColor = vec4(color, 1.0);
       }
     `;
 
