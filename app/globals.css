@@ -2,10 +2,18 @@
 
 @layer components {
   .card {
-    @apply flex flex-col justify-between w-3/4 h-80 p-9 border-[1px] border-[rgba(255,255,255,0.25)] rounded-[20px] bg-[rgba(255,255,255,0.1)] shadow-[0_0_10px_1px_rgba(0,0,0,0.25)] backdrop-blur-[15px] text-white;
+    @apply flex items-center justify-center w-3/4 h-72 p-9 text-[#492D0D] bg-white rounded-2xl;
+    box-shadow: 0 10px 60px OrangeRed, inset 0px -10px 17px 2px DarkOrange;
+  }
+
+  .card p {
+    @apply text-2xl font-[900] text-[#492D0D];
   }
 
   .card-footer {
-    @apply text-[1.2em] text-white;
+    @apply text-[#492D0D] text-[34pt] font-[900];
+    color: white !important;
+    text-shadow: 1px 1px 0px DarkOrange, 2px 2px 0px DarkOrange,
+      3px 3px 0px DarkOrange, -1px -1px 0px DarkOrange;
   }
 }
